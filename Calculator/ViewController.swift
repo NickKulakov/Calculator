@@ -29,7 +29,7 @@ class ViewController: UIViewController {
             if (digit == decimalSeparator) && (display.text?.range(of: decimalSeparator)) != nil {return}
         //уничтожаем лидирующие нули
             if (digit == "0") && ((display.text == "0") || (display.text == "-0")) {return}
-            if (digit != decimalSeparator) && ((display.text == "0") || (display.text == "-0")) {display.text = digit; return}
+            if (digit != decimalSeparator) && ((display.text == "0") || (display.text == "-0")) {display.text = "0" + digit; return}
         //-------------------------------------------------------------------
             display.text = display.text! + digit
         } else {
@@ -54,13 +54,14 @@ class ViewController: UIViewController {
     
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
-        addHistory(text: display.text!)
+        
         if let result = brain.pushOperand(operand: displayValue) {
             displayValue = result
         } else {
             //error ?
             displayValue = 0 // the task № 2
         }
+        addHistory(text: display.text!)
         //        operandStack.append(displayValue)
         //        print("operandStack =  \(operandStack)")
     }
