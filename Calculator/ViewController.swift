@@ -11,14 +11,26 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var display: UILabel!
-    var userIsInTheMiddleOfTypingANumber: Bool = false
+    @IBOutlet weak var history: UILabel!
+    @IBOutlet weak var tochka: UIButton! {
+        didSet{
+            tochka.setTitle(decimalSeparator, for: UIControlState.normal)
+        }
+    }
     
+    var userIsInTheMiddleOfTypingANumber: Bool = false
+    let decimalSeparator = NumberFormatter().decimalSeparator ?? "."
     var brain = CalculatorBrain()
     
     @IBAction func appendDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
-        
         if userIsInTheMiddleOfTypingANumber {
+        //попытаемся заблокировать повторный ввод десятичного разделителя
+            if (digit == decimalSeparator) && (display.text?.range(of: decimalSeparator)) != nil {return}
+        //уничтожаем лидирующие нули
+            if (digit == "0") && ((display.text == "0") || (display.text == "-0")) {return}
+            if (digit != decimalSeparator) && ((display.text == "0") || (display.text == "-0")) {display.text = digit; return}
+        //-------------------------------------------------------------------
             display.text = display.text! + digit
         } else {
             display.text = digit
@@ -31,6 +43,7 @@ class ViewController: UIViewController {
             enter()
         }
         if let operation = sender.currentTitle {
+            addHistory(text: operation + "=")
             if let result = brain.performOperation(symbol: operation) {
                 displayValue = result
             } else {
@@ -41,6 +54,7 @@ class ViewController: UIViewController {
     
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
+        addHistory(text: display.text!)
         if let result = brain.pushOperand(operand: displayValue) {
             displayValue = result
         } else {
@@ -51,40 +65,31 @@ class ViewController: UIViewController {
         //        print("operandStack =  \(operandStack)")
     }
     
+    func addHistory(text: String) {
+//        history.text = history.text!.range(of: "=") != nil ? dropLast(history.text): history.text
+        if history.text!.range(of: "=") != nil {
+            
+            history.text = String(history.text!.dropLast())
+        } else {
+            history.text = history.text
+        }
+        history.text = history.text! + " " + text
     
-    
+    }
     
     var displayValue: Double {
         get {
             var dispV = NSNumber()
+            
             if let dispString = display.text {
                 dispV = NSNumber(value: Double("\(dispString)")!)
             }
             return Double(truncating: dispV)
         }
-
-        
-        
-        // equivalent code
-        // NSNumber(value: Int("String")!)
-        
-        //            var dispVal = Double()
-        //            if let displayString = display.text {
-        //                if let displayDouble = Double(displayString) {
-        //                    dispVal = displayDouble
-        //                }
-        //            }
-        //            return dispVal
-        //    }
-
-        
-        
         set {
             display.text = "\(newValue)"
             userIsInTheMiddleOfTypingANumber = false
         }
     }
-    
-    
 }
 

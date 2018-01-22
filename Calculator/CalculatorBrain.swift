@@ -41,6 +41,7 @@ class CalculatorBrain {
         func learnOp (op: Op) {
             knownOps[op.description] = op
         }
+        
         learnOp(op: .BinaryOperation("×", *))
         learnOp(op: .BinaryOperation("+", +))
         learnOp(op: .BinaryOperation("÷") {$1 / $0})
@@ -50,7 +51,6 @@ class CalculatorBrain {
         learnOp(op: .UnaryOperation("cos") {cos($0)})
         learnOp(op: .EmptyOperation("𝝅", .pi))
         learnOp(op: .UnaryOperation("±") {-$0})
-        
         
         //knownOps["×"] = Op.BinaryOperation("×", *)
         //knownOps["+"] = Op.BinaryOperation("+", +)
