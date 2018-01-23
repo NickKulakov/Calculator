@@ -25,12 +25,12 @@ class ViewController: UIViewController {
     @IBAction func appendDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         if userIsInTheMiddleOfTypingANumber {
-        //попытаемся заблокировать повторный ввод десятичного разделителя
+            //попытаемся заблокировать повторный ввод десятичного разделителя
             if (digit == decimalSeparator) && (display.text?.range(of: decimalSeparator)) != nil {return}
-        //уничтожаем лидирующие нули
+            //уничтожаем лидирующие нули
             if (digit == "0") && ((display.text == "0") || (display.text == "-0")) {return}
             if (digit != decimalSeparator) && ((display.text == "0") || (display.text == "-0")) {display.text = "0" + digit; return}
-        //-------------------------------------------------------------------
+            //-------------------------------------------------------------------
             display.text = display.text! + digit
         } else {
             display.text = digit
@@ -54,7 +54,6 @@ class ViewController: UIViewController {
     
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
-        
         if let result = brain.pushOperand(operand: displayValue) {
             displayValue = result
         } else {
@@ -62,20 +61,42 @@ class ViewController: UIViewController {
             displayValue = 0 // the task № 2
         }
         addHistory(text: display.text!)
-        //        operandStack.append(displayValue)
-        //        print("operandStack =  \(operandStack)")
+    }
+    
+    @IBAction func plusMinus(_ sender: UIButton) {
+        if userIsInTheMiddleOfTypingANumber {
+            if (display.text!.range(of: "-") != nil) {
+                display.text = String(display.text!.dropFirst())
+            } else {
+                display.text = "-" + display.text!
+            }
+        } else {
+             operate(sender)
+        }
+    }
+    
+    @IBAction func clearAll(_ sender: UIButton) {
+        displayValue = 0
+        history.text = " "
+    }
+    
+    @IBAction func backSpace(_ sender: UIButton) {
+        if userIsInTheMiddleOfTypingANumber {
+            if display.text?.count != 1 {
+                display.text = String(describing: display.text!.dropLast())
+            } else {
+               displayValue = 0
+            }
+        }
     }
     
     func addHistory(text: String) {
-//        history.text = history.text!.range(of: "=") != nil ? dropLast(history.text): history.text
         if history.text!.range(of: "=") != nil {
-            
             history.text = String(history.text!.dropLast())
         } else {
             history.text = history.text
         }
         history.text = history.text! + " " + text
-    
     }
     
     var displayValue: Double {
